@@ -9,7 +9,7 @@ import { AuthContext } from "../../contexts/AuthProvider";
 
 const MainLayout = ({ role }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { logOut } = useContext(AuthContext);
+  const { logOut, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -21,6 +21,10 @@ const MainLayout = ({ role }) => {
         throw Error(error);
       });
   };
+
+  if (loading) {
+    return <div>Loading ....</div>
+  }
 
   return (
     <div className="flex h-screen">
