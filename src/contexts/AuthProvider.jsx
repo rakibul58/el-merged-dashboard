@@ -11,13 +11,14 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 import app from "../firebase/firebase.config";
+import { generateToken } from "../utils/generateToken";
+import config from "../config";
 
 export const AuthContext = createContext();
 const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({});
-  const userAgent = navigator.userAgent;
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState({});
 
@@ -30,19 +31,6 @@ const AuthProvider = ({ children }) => {
   const logOut = () => {
     setLoading(true);
 
-    try {
-      if (userInfo?.email) {
-        axios.put(
-          `${import.meta.env.VITE_SERVERLESS_API}/api/v1/users/removeDevice/${
-            userInfo?.email
-          }`,
-          { device: userAgent }
-        );
-      }
-    } catch (error) {
-      console.error("Error removing device:", error);
-    }
-
     return signOut(auth);
   };
 
@@ -50,6 +38,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return signOut(auth);
   };
+
   const forgotPassword = () => {
     sendPasswordResetEmail(auth, auth.currentUser.email)
       .then(() => {
@@ -61,9 +50,14 @@ const AuthProvider = ({ children }) => {
   };
 
   // sign in with email and password
-  const signIn = (email, password) => {
+  const signIn = async (email, password) => {
     setLoading(true);
-
+    const newToken = await generateToken({
+      isProviderLogin: false,
+      email,
+      password,
+    });
+    localStorage.setItem("token", newToken);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
@@ -78,7 +72,6 @@ const AuthProvider = ({ children }) => {
       auth,
       (currentUser) => {
         setUser(currentUser);
-
         setLoading(false);
       },
       []
@@ -91,11 +84,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     axios
-      .get(
-        `${import.meta.env.VITE_SERVERLESS_API}/api/v1/users?email=${
-          user?.email
-        }`
-      )
+      .get(`${config.serverless_api}/api/v1/users?email=${user?.email}`)
       .then((user) => {
         setUserInfo(user?.data);
       })

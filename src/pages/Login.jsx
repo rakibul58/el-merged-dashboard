@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { GoogleAuthProvider } from "firebase/auth";
 import toast from "react-hot-toast";
 import { AuthContext } from "../contexts/AuthProvider";
+import config from "../config";
 
 const Login = () => {
   const { user, userInfo, signIn, providerLogin, logOut } =
@@ -24,47 +25,23 @@ const Login = () => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    const userAgent = window.navigator.userAgent;
 
     const form = e?.target;
     const email = form.email.value;
     const password = form.password.value;
-    try {
-      const userDevice = await axios.put(
-        `${
-          import.meta.env.VITE_SERVERLESS_API
-        }/api/v1/users/addDevice/${email}`,
-        {
-          device: userAgent,
-        }
-      );
 
-      // Assuming your server returns a specific status code for device limit reached
-      if (userDevice?.status === 200) {
-        try {
-          await signIn(email, password).then(() => {
-            saveUser(email);
-          });
-        } catch (error) {
-          toast.error("Please enter correct password.");
-        }
-      } else {
-        toast.error("Please logout from one of your devices and try again.");
-      }
+    try {
+      signIn(email, password).then(() => {
+        saveUser(email);
+      });
     } catch (error) {
-      if (error?.response?.status === 400) {
-        toast.error("Please logout from one of your devices and try again.");
-      } else {
-        toast.error("Please enter valid email.");
-      }
+      toast.error("Please enter correct password.");
     }
   };
 
   const saveUser = async (email) => {
     try {
-      fetch(
-        `${import.meta.env.VITE_SERVERLESS_API}/api/v1/users?email=${email}`
-      )
+      fetch(`${config.serverless_api}/api/v1/users?email=${email}`)
         .then((res) => res.json())
         .then((data) => {
           localStorage.setItem("role", data?.role);
@@ -89,10 +66,11 @@ const Login = () => {
     const googleProvider = new GoogleAuthProvider();
     providerLogin(googleProvider)
       .then(async (result) => {
+        console.log({ result });
         setRedirectUser(false);
         const email = result?.user?.email;
         const userDetails = await axios.get(
-          `${import.meta.env.VITE_SERVERLESS_API}/api/v1/users?email=${email}`
+          `${config.serverless_api}/api/v1/users?email=${email}`
         );
         if (userDetails?.data?.isUser === false) {
           toast.error("Your Are Not Registered User");
@@ -101,9 +79,7 @@ const Login = () => {
           try {
             const userAgent = window.navigator.userAgent;
             const userDevice = await axios.put(
-              `${
-                import.meta.env.VITE_SERVERLESS_API
-              }/api/v1/users/addDevice/${email}`,
+              `${config.serverless_api}/api/v1/users/addDevice/${email}`,
               {
                 device: userAgent,
               }
