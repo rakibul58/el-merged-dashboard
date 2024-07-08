@@ -1,8 +1,25 @@
+import config from "../../config";
+
 const Lead = () => {
+  const token = localStorage.getItem("token");
+
   return (
-    <div>
-      <h1>This is Lead Component</h1>
-    </div>
+    <>
+      {token ? (
+        <iframe
+          className="w-full h-screen"
+          loading="lazy"
+          src={
+            config.dev_env === "dev"
+              ? `http://localhost:5174/preDashboard?token=${token}`
+              : // `https://experimentlabsinternshipportal.web.app/preDashboard?token=${token}`
+                `https://experimentlabsinternshipportal.web.app/preDashboard?token=${token}`
+          }
+        ></iframe>
+      ) : (
+        <div>Loading .....</div>
+      )}
+    </>
   );
 };
 

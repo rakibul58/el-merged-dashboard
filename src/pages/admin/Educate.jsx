@@ -1,6 +1,25 @@
+import config from "../../config";
+
 const Educate = () => {
+  const token = localStorage.getItem("token");
+
   return (
-    <iframe className="w-full h-screen" src="https://experimentlabs.in/"></iframe>
+    <>
+      {token ? (
+        <iframe
+          className="w-full h-screen"
+          loading="lazy"
+          src={
+            config.dev_env === "dev"
+              ? // ? `http://localhost:3000/preDashboard?token=${token}`
+                `https://experiment-labs-masters.web.app/preDashboard?token=${token}`
+              : `https://experimentlabs.in/preDashboard?token=${token}`
+          }
+        ></iframe>
+      ) : (
+        <div>Loading .....</div>
+      )}
+    </>
   );
 };
 
