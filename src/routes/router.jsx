@@ -5,11 +5,16 @@ import { studentRoutes } from "./student.routes";
 import { adminRoutes } from "./admin.routes";
 import { schoolRoutes } from "./school.routes";
 import Login from "../pages/Login";
+import CreateOrganization from "../pages/CreateOrganization";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Login />,
+  },
+  {
+    path: "/createOrganization",
+    element: <CreateOrganization />,
   },
   {
     path: "/login",
