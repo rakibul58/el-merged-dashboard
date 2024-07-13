@@ -12,7 +12,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import app from "../firebase/firebase.config";
 import { generateToken } from "../utils/generateToken";
-import config from "../config";
+
 
 export const AuthContext = createContext();
 const auth = getAuth(app);
@@ -84,9 +84,10 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     axios
-      .get(`${config.serverless_api}/api/v1/users?email=${user?.email}`)
+     // .get(`${config.serverless_api}/api/v1/users?email=${user?.email}`)
+      .get(`http://localhost:5000/api/v1/user/${user?.email}`)
       .then((user) => {
-        setUserInfo(user?.data);
+        setUserInfo(user?.data.data);
       })
       .catch((error) => console.error(error));
   }, [user?.email, userInfo?.email]);
