@@ -13,7 +13,7 @@ const CustomNavLinks = ({ item, role }) => {
           isActive ? activeClasses : inActiveClasses
         }
       >
-        {item.label}
+        {item}
       </NavLink>
     </li>
   );

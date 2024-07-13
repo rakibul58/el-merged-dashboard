@@ -1,16 +1,28 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { parentRoutes } from "../../routes/parent.routes";
+
 import CustomNavLinks from "../ui/MainLayout/CustomNavLinks";
-import { studentRoutes } from "../../routes/student.routes";
-import { adminRoutes } from "../../routes/admin.routes";
-import { schoolRoutes } from "../../routes/school.routes";
+
 import { AuthContext } from "../../contexts/AuthProvider";
+import axios from "axios";
 
 const MainLayout = ({ role }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [organizationDetails, setOrganizationDetails] = useState();
   const { logOut, loading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const {userInfo} = useContext(AuthContext)
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/v1/organizations/668e122e1af8b0decb4bd6f4`)
+      .then((org) => {
+        setOrganizationDetails(org?.data.data);
+      })
+      .catch((error) => console.error(error));
+  }, []);
+  
+
 
   const handleLogout = async () => {
     await logOut()
@@ -48,19 +60,19 @@ const MainLayout = ({ role }) => {
         <nav className="">
           <ul>
             {role === "student" &&
-              studentRoutes?.map((item, index) => (
+              organizationDetails?.studentRoutes?.map((item, index) => (
                 <CustomNavLinks item={item} key={index} role={role} />
               ))}
             {role === "parent" &&
-              parentRoutes?.map((item, index) => (
+             organizationDetails?.parentRoutes?.map((item, index) => (
                 <CustomNavLinks item={item} key={index} role={role} />
               ))}
             {role === "admin" &&
-              adminRoutes?.map((item, index) => (
+              organizationDetails?.adminRoutes?.map((item, index) => (
                 <CustomNavLinks item={item} key={index} role={role} />
               ))}
             {role === "school" &&
-              schoolRoutes?.map((item, index) => (
+              organizationDetails?.schoolRoutes?.map((item, index) => (
                 <CustomNavLinks item={item} key={index} role={role} />
               ))}
 
